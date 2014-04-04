@@ -1,0 +1,15 @@
+{
+  "name": "gui_inbound",
+  "version": "0.0.0",
+  "description": "testing",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andre Smith",
+  "license": "MIT",
+  "dependencies": {
+    "logfmt": "^1.1.2",
+    "express": "^3.5.1"
+  }
+}
