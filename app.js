@@ -36,7 +36,9 @@ app.post('/inbound', function(req, res) {
         date: date
       };
 
-      db.collection('test').insert(record, function(err,result) {
+      var collectionName = monitorName.replace(' ', '_').toLowerCase();
+
+      db.collection(collectionName).insert(record, function(err,result) {
         if (err){
           throw err;
         }
