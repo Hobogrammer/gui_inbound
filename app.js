@@ -15,11 +15,10 @@ app.post('/inbound', function(req, res) {
   });
 
   req.on('end', function(){
-    console.log(incomingMail);
     var mailJSON = JSON.parse(incomingMail);
 
     if (mailJSON.Subject.match(/\[General UI\] "Production Support"/)) {
-      var status = mailJSON.Subject.match(/(UP|DOWN|Up|Down)/)[0].toLowerCase();
+      var status = mailJSON.Subject.toLowerCase().match(/\s+(down)\s*/) ? "down" : "up";
       var projectName = '';
       var monitorName = '';
 
@@ -30,7 +29,7 @@ app.post('/inbound', function(req, res) {
       }
       else if (mailJSON.Subject.match(/Monitor/)) {
         monitorName = 'Uptime Robot';
-        projectName = mailJSON.Subject.match(/: (RM .+)/)[0];
+        projectName = mailJSON.Subject.match(/: (RM .+)/)[1];
       }
 
       record = {
@@ -44,15 +43,22 @@ app.post('/inbound', function(req, res) {
 
       db.collection(collectionName).insert(record, function(err,result) {
         if (err){
-          throw err;
-        }
-        console.log('databased : ' + monitorName + ': ' + projectName + ': ' + status + ': ' + date);
+          res.send(err);
+        }else{
+            console.log('databased : ' + monitorName + ': ' + projectName + ': ' + status + ': ' + date);
 
-        recentCheck.process();
+            recentCheck.process(projectName,function(err){
+              if (err){
+                console.log(err);
+              }
+              res.send('finished');
+          });
+
+        }
       });
 
     } else {
-      console.log("Invalid email");
+      res.send("Invalid email");
     }
   });
 });
