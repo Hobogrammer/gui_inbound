@@ -18,15 +18,18 @@ app.post('/inbound', function(req, res) {
     var mailJSON = JSON.parse(incomingMail);
 
     if (mailJSON.Subject.match(/\[General UI\] "Production Support"/)) {
-      var status = mailJSON.Subject.match(/UP|DOWN/)[0];
-      var projectName = mailJSON.Subject.match(/RM(.+)/g)[0];
+      var status = mailJSON.Subject.match(/(UP|DOWN|Up|Down)/)[0].toLowerCase();
+      var projectName = '';
       var monitorName = '';
 
-      if (mailJSON.Subject.match(/You Site:/)) {
+      if (mailJSON.Subject.match(/Your Site:/)) {
         monitorName = 'StatusCake';
+        projectName = mailJSON.Subject.match(/Site: (.*?) Is/)[1];
+
       }
       else if (mailJSON.Subject.match(/Monitor/)) {
         monitorName = 'Uptime Robot';
+        projectName = mailJSON.Subject.match(/: (RM .+)/)[0];
       }
 
       record = {
