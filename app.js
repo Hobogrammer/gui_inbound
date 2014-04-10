@@ -2,12 +2,12 @@ var db = require('mongoskin').db('mongodb://localhost:27017/local');
 var express = require("express");
 var logfmt = require("logfmt");
 var app = express();
+var recentCheck = require('./recent_check');
 
 app.use(logfmt.requestLogger());
 
 app.post('/inbound', function(req, res) {
   var incomingMail = '';
-  var monitorName = '';
   var date = Date.now();
 
   req.on('data', function(data){
@@ -15,6 +15,7 @@ app.post('/inbound', function(req, res) {
   });
 
   req.on('end', function(){
+    console.log(incomingMail);
     var mailJSON = JSON.parse(incomingMail);
 
     if (mailJSON.Subject.match(/\[General UI\] "Production Support"/)) {
@@ -46,6 +47,8 @@ app.post('/inbound', function(req, res) {
           throw err;
         }
         console.log('databased : ' + monitorName + ': ' + projectName + ': ' + status + ': ' + date);
+
+        recentCheck.process();
       });
 
     } else {
